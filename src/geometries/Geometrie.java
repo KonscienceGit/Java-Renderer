@@ -28,7 +28,7 @@ public abstract class Geometrie {
 	protected static float scale = 0.5f;
 
 	/**@return Retourne l'échelle de scaling vertical (axe z) du modèle*/
-	public static float getScale() {
+	public float getScale() {
 		return scale;
 	}
 

@@ -2,37 +2,27 @@ package geometries;
 
 import java.nio.IntBuffer;
 import java.util.Vector;
-import com.jogamp.opengl.GL4ES3;
+import static com.jogamp.opengl.GL4.*;
 
 public class DisplacementMeshShaded extends Geometrie {
 	public DisplacementMeshShaded() {
-		if(wireframe) {
-			drawMethod = GL4ES3.GL_LINES;
-		}else {
-			drawMethod = GL4ES3.GL_TRIANGLES;	
-		}
+		drawMethod = GL_TRIANGLES;	
 		wireframe = false;	
-		valueType = GL4ES3.GL_UNSIGNED_INT;
+		valueType = GL_UNSIGNED_INT;
 		textured = true;
 		triDimensional = false;
 		rotate2D = false;
 		rotate3D = true;
 		texturePath = "images/height_map.jpg";
 		lightSource = true;
-		if (lightSource) {
-			wireframe = false;
-			vertexShaderPath = "shaders/DisplacementFlatLighting/vertex.vert";
-			geomShaderPath = "shaders/DisplacementFlatLighting/geometrie.geom";
-			//geomShaderPath = "shaders/DisplacementFlatLighting/geometriePoints.geom";
-			fragmentShaderPath = "shaders/DisplacementFlatLighting/fragment.frag";
-			//fragmentShaderPath = "shaders/DisplacementFlatLighting/fragmentWhite.frag";
-			//fragmentShaderPath = "shaders/DisplacementFlatLighting/fragmentNormalColored.frag";
-			//fragmentShaderPath = "shaders/DisplacementFlatLighting/fragmentDepthBuffDebug.frag";
-		}else {
-			vertexShaderPath = "shaders/displacement.vert";
-			fragmentShaderPath = "shaders/vertexColored.frag";
-		}
-		
+		vertexShaderPath = "shaders/DisplacementFlatLighting/vertex.vert";
+		geomShaderPath = "shaders/DisplacementFlatLighting/geometrie.geom";
+		//geomShaderPath = "shaders/DisplacementFlatLighting/geometriePoints.geom";
+		fragmentShaderPath = "shaders/DisplacementFlatLighting/fragment.frag";
+		//fragmentShaderPath = "shaders/DisplacementFlatLighting/fragmentWhite.frag";
+		//fragmentShaderPath = "shaders/DisplacementFlatLighting/fragmentNormalColored.frag";
+		//fragmentShaderPath = "shaders/DisplacementFlatLighting/fragmentDepthBuffDebug.frag";
+
 		byteStride = 4*Float.BYTES;
 		byteOffset = 2*Float.BYTES;
 		polygonDetail = 256;
@@ -130,7 +120,6 @@ public class DisplacementMeshShaded extends Geometrie {
 				elementVec.add((x+1)+y*n);//angle supérieur droit, triangle 2
 				elementVec.add(x+(y+1)*n);//angle inférieur gauche, triangle 2
 				elementVec.add((x+1)+(y+1)*n);//angle inférieur droit, triangle 2
-				
 			}
 		}
 		return elementVec;

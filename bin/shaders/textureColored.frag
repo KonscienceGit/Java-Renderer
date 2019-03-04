@@ -1,4 +1,3 @@
-
 #version 330
 
 // Incoming interpolated (between vertices) texture coordinates.

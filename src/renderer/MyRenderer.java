@@ -2,17 +2,6 @@ package renderer;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-import com.jogamp.opengl.GL4;
-
-import static com.jogamp.opengl.GL.*;
-import static com.jogamp.opengl.GL2ES2.GL_RED;
-import static com.jogamp.opengl.GL2ES3.GL_BLUE;
-import static com.jogamp.opengl.GL2ES3.GL_GREEN;
-import static com.jogamp.opengl.GL2ES3.GL_TEXTURE_BASE_LEVEL;
-import static com.jogamp.opengl.GL2ES3.GL_TEXTURE_MAX_LEVEL;
-import static com.jogamp.opengl.GL2GL3.GL_TEXTURE_SWIZZLE_RGBA;
-import static renderer.MyShaderLoader.createProgram;
-
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.File;
@@ -22,6 +11,8 @@ import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import com.jogamp.opengl.GL4;
+import static com.jogamp.opengl.GL4.*;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLEventListener;
@@ -29,8 +20,8 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.math.FloatUtil;
 import com.jogamp.opengl.util.Animator;
-import com.jogamp.opengl.util.GLBuffers;
 
+import static renderer.MyShaderLoader.createProgram;
 import geometries.*;
 import geometries.wangTile.WangTile;
 
@@ -46,49 +37,40 @@ public class MyRenderer implements GLEventListener{
 	private static int vertexOffset;
 	private static int positionAttributeNumber; 
 	private static final float pi = (float)Math.PI;
+	private static boolean benchmark = false;
+	private static int _shaderProgram = -2;
 	   
 	//Uniform locations
 	private static int proj_uni_location;
 	private static int view_uni_location;
 	private static int model_uni_location;
 	private static int texMap_uni_location; //texture map passed as uniform
-	private static int lightVector_uni_location; //vecteur de lumiere (situé à l'infini)
+	private static int lightVector_uni_location; //vecteur de lumiere
 	private static int displacementScale_uni_location; //scaling vertical du displacement mapping
 	//attribute locations
 	private static int pos_att_location;
 	private static int vertColor_att_location;
 	private static int texCoord_att_location;
-	
-	private static boolean benchmark = false;
-	   
-	//Shader program
-	private static int shaderProgramName = 0;
-	
-	//Enum VAO_IDs
-	private interface VAO_ID {
-		    int VAO_0 = 0;
-			int NbVAO = 1; // nombre total de VAO
-	    }
-	
+
 	//Vertex Array Object(s)
-	private IntBuffer vao = GLBuffers.newDirectIntBuffer(VAO_ID.NbVAO);
+	private interface VAO_ID {
+	    int VAO_0 = 0;
+		int NbVAO = 1; // nombre total de VAO
+    }
+	private IntBuffer vao = IntBuffer.allocate(VAO_ID.NbVAO);
 		
-	//Enum VBO_IDs
+	//Buffer Object(s)
 	private interface Buffers_ID {
 	    int Vertex = 0; //numero du VBO pour les vertex
 		int Element = 1; //numero du VBO pour les elements
 		int NbBuffer = 2; // nombre total de VBO
     }
-	    
-	//Buffer Object(s)
-	private IntBuffer buffers = GLBuffers.newDirectIntBuffer(Buffers_ID.NbBuffer);
-	
+	private IntBuffer buffers = IntBuffer.allocate(Buffers_ID.NbBuffer);
 	private interface Textures_ID {
 	    int Texture0 = 0;
 		int NbTextures = 1;
     }
-	
-	private IntBuffer textures = GLBuffers.newDirectIntBuffer(Textures_ID.NbTextures);
+	private IntBuffer textures = IntBuffer.allocate(Textures_ID.NbTextures);
 
 	public static void main(String[] args) {
 		final GLProfile profile = GLProfile.get(GLProfile.GL4);
@@ -109,15 +91,15 @@ public class MyRenderer implements GLEventListener{
         animator.start();
 		start = last = System.currentTimeMillis();
 	}//end of main
-
+      
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		//get context
 		GL4 gl = drawable.getGL().getGL4();
-		
+		//System.out.println(Toolbox.getGraphicCapabilities(gl));
 		initShaders(gl);
 		initVAO(gl);
-		
+		//displayUniformStatus();
 		if(geometrie.isTextured()) {
 			initTextures(gl);	
 		}
@@ -135,18 +117,18 @@ public class MyRenderer implements GLEventListener{
 	private void initShaders(GL4 gl) {
 		//-------------------------------------
 		//Shaders & Uniforms
-		shaderProgramName = createProgram(gl, geometrie);//creating the program shader from a vertex and fragment shader
-		gl.glUseProgram(shaderProgramName);//selecting the shader program as active
+		_shaderProgram = createProgram(gl, geometrie);//creating the program shader from a vertex and fragment shader
+		gl.glUseProgram(_shaderProgram);//selecting the shader program as active
 
 		if (geometrie.isTextured()) {
-			texCoord_att_location = gl.glGetAttribLocation(shaderProgramName, "texCoord");//getting the attribute name for texture coordinate
-			texMap_uni_location = gl.glGetUniformLocation(shaderProgramName, "texMap");//getting the attribute name for the texture map uniform
+			texCoord_att_location = gl.glGetAttribLocation(_shaderProgram, "texCoord");//getting the attribute name for texture coordinate
+			texMap_uni_location = gl.glGetUniformLocation(_shaderProgram, "texMap");//getting the attribute name for the texture map uniform
 		}else {
-			vertColor_att_location = gl.glGetAttribLocation(shaderProgramName, "color");
+			vertColor_att_location = gl.glGetAttribLocation(_shaderProgram, "color");
 		}
 		
 		if(geometrie.hasLightSource()){
-			lightVector_uni_location = gl.glGetUniformLocation(shaderProgramName, "lightVector");
+			lightVector_uni_location = gl.glGetUniformLocation(_shaderProgram, "lightVector");
 			float[] lightVectorArray = {0.5f,-0.5f,0.5f};
 			Toolbox.normalize3(lightVectorArray);
 			FloatBuffer lightVectorBuffer = FloatBuffer.wrap(lightVectorArray);
@@ -154,18 +136,18 @@ public class MyRenderer implements GLEventListener{
 		}
 
 		if(geometrie.hasNormals()){
-			displacementScale_uni_location = gl.glGetUniformLocation(shaderProgramName,"dispScale");
+			displacementScale_uni_location = gl.glGetUniformLocation(_shaderProgram,"dispScale");
 			gl.glUniform1f(displacementScale_uni_location, geometrie.getScale() );
 		}
-		
-		pos_att_location = gl.glGetAttribLocation(shaderProgramName, "position");
-		proj_uni_location = gl.glGetUniformLocation(shaderProgramName,"proj");
-		view_uni_location = gl.glGetUniformLocation(shaderProgramName,"view");
-		model_uni_location = gl.glGetUniformLocation(shaderProgramName,"model");
 
-		FloatBuffer projMatrixBuffer = GLBuffers.newDirectFloatBuffer(FloatUtil.makeIdentity(new float[16]));
+		pos_att_location = gl.glGetAttribLocation(_shaderProgram, "position");
+		proj_uni_location = gl.glGetUniformLocation(_shaderProgram,"proj");
+		view_uni_location = gl.glGetUniformLocation(_shaderProgram,"view");
+		model_uni_location = gl.glGetUniformLocation(_shaderProgram,"model");
+
+		FloatBuffer projMatrixBuffer = FloatBuffer.wrap(FloatUtil.makeIdentity(new float[16]));
 		gl.glUniformMatrix4fv(proj_uni_location, 1, false, projMatrixBuffer );
-		FloatBuffer viewMatrixBuffer = GLBuffers.newDirectFloatBuffer(FloatUtil.makeIdentity(new float[16]));
+		FloatBuffer viewMatrixBuffer = FloatBuffer.wrap(FloatUtil.makeIdentity(new float[16]));
 		gl.glUniformMatrix4fv(view_uni_location, 1, false, viewMatrixBuffer	);
 	}
 
@@ -190,7 +172,7 @@ public class MyRenderer implements GLEventListener{
 		//-------------------------------------
 		//Vertices
 		float[] vertexData = geometrie.getVertexData();//get vertex array from the selected shape object	
-	    FloatBuffer vertexBuffer = GLBuffers.newDirectFloatBuffer(vertexData);//automatically generate a buffer from the given array (size and content included)
+	    FloatBuffer vertexBuffer = FloatBuffer.wrap(vertexData);//automatically generate a buffer from the given array (size and content included)
 		gl.glBindBuffer(GL_ARRAY_BUFFER, buffers.get(Buffers_ID.Vertex));//Bind le buffer de vertex (numero 0) à la target ARRAY_BUFFER
 		gl.glBufferData(GL_ARRAY_BUFFER, vertexBuffer.capacity()*Float.BYTES, vertexBuffer, GL_STATIC_DRAW);//crée et initialise la banque de données d'un buffer object
 	}
@@ -205,15 +187,15 @@ public class MyRenderer implements GLEventListener{
         	positionAttributeNumber = 2;
         }
 		
-        gl.glEnableVertexAttribArray(pos_att_location);//active l'attribut du shader pour ce buffer
         gl.glVertexAttribPointer(pos_att_location, positionAttributeNumber, GL_FLOAT, false, vertexStride, 0);//definis la position de l'attribut dans le buffer
+        gl.glEnableVertexAttribArray(pos_att_location);//active l'attribut du shader pour ce buffer
         
         if(geometrie.isTextured()) {
-        	gl.glEnableVertexAttribArray(texCoord_att_location);
         	gl.glVertexAttribPointer(texCoord_att_location, 2, GL_FLOAT, false, vertexStride, vertexOffset);
+        	gl.glEnableVertexAttribArray(texCoord_att_location);
         }else {//Not textured, using vertex color
-        	gl.glEnableVertexAttribArray(vertColor_att_location);
     		gl.glVertexAttribPointer(vertColor_att_location, 3, GL_FLOAT, false, vertexStride, vertexOffset);
+    		gl.glEnableVertexAttribArray(vertColor_att_location);
         }
 	}
 	
@@ -228,7 +210,8 @@ public class MyRenderer implements GLEventListener{
 	private void initTextures(GL4 gl) {
 		gl.glGenTextures(Textures_ID.NbTextures, textures); // generate the texture names in the textures buffer array
 		gl.glActiveTexture(GL_TEXTURE0); //select a texture unit (0) to be the one active
-        gl.glBindTexture(GL_TEXTURE_2D, textures.get(Textures_ID.Texture0)); //bind the texture name, create a texture object of the designated target type and associate the name to it.
+        gl.glBindTexture(GL_TEXTURE_2D, textures.get(Textures_ID.Texture0)); //bind the texture name, 
+        //create a texture object of the designated target type and associate the name to it.
         
         URL imgUrl = getClass().getClassLoader().getResource(geometrie.getTexturePath());
         if (imgUrl == null) {
@@ -260,7 +243,7 @@ public class MyRenderer implements GLEventListener{
 		gl.glTexImage2D(//specify the texture object properties, could use texStorage2D to give the object a final allocation size
 				GL_TEXTURE_2D,//target
 				mipmapLevel,
-				GL_RGB,//internal color format (GL_RGB, etc)
+				GL_RGB8,//internal color format (GL_RGB, etc)
 				imgWidth,
 				imgHeight,
 				0,//border around the texture
@@ -275,18 +258,17 @@ public class MyRenderer implements GLEventListener{
 		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		gl.glSamplerParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		gl.glSamplerParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		IntBuffer swizzle = GLBuffers.newDirectIntBuffer(new int[]{GL_RED, GL_GREEN, GL_BLUE, GL_ONE});
+		IntBuffer swizzle = IntBuffer.wrap(new int[]{GL_RED, GL_GREEN, GL_BLUE, GL_ONE});
 		//swizzle the colors of the textures, see https://www.khronos.org/opengl/wiki/Texture#Swizzle_mask
 		gl.glTexParameterIiv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle);
-        gl.glBindTexture(GL_TEXTURE_2D, 0);
+        //gl.glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
     private void updateModelMatrix(GL4 gl) {
         // update model matrix to rotate
         long now = System.currentTimeMillis();
         float diff = (float) (now - start) / 3000;
-        float[] scale = FloatUtil.makeScale(new float[16], true, 0.60f, 0.60f, 0.60f );
-        FloatBuffer modelMatrixBuffer;
+        float[] scale = FloatUtil.makeScale(new float[16], true, 0.80f, 0.80f, 0.60f );
         float[] rotation = FloatUtil.makeRotationEuler(new float[16], 0, 4*pi/3, 0, 0);//(le "penche en avant")
 		//float[] rotation = FloatUtil.makeRotationEuler(new float[16], 0, pi, 0, 0);//vue de dessus
     	float[] rotate;
@@ -299,7 +281,7 @@ public class MyRenderer implements GLEventListener{
         }
         float[] modelMatrixArray = FloatUtil.multMatrix(scale, rotation);
         modelMatrixArray = FloatUtil.multMatrix(modelMatrixArray, rotate);
-        modelMatrixBuffer = GLBuffers.newDirectFloatBuffer(modelMatrixArray);
+        FloatBuffer modelMatrixBuffer = FloatBuffer.wrap(modelMatrixArray);
         
         gl.glUniformMatrix4fv(model_uni_location, 1, false, modelMatrixBuffer );
     }
@@ -313,17 +295,18 @@ public class MyRenderer implements GLEventListener{
 
 		if(geometrie.isTextured()) {
 			gl.glActiveTexture(GL_TEXTURE0); //select a texture unit (0) to be the one active
-			gl.glBindTexture(GL_TEXTURE_2D, textures.get(Textures_ID.Texture0)); //attach the texture to the active unit (and tell it it's a 2D texture)
+			//pas besoin de réattacher la texture à la texture Unit si on 
+			// utilise 1 sampler différent pour chaque texture
+			//gl.glBindTexture(GL_TEXTURE_2D, textures.get(Textures_ID.Texture0)); 
 		}
 
-		//--------------------------------
 		//Binding
-		gl.glUseProgram(shaderProgramName);
+		gl.glUseProgram(_shaderProgram);
 		gl.glBindVertexArray(vao.get(VAO_ID.VAO_0));
 		gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.get(Buffers_ID.Element));
 
 		updateModelMatrix(gl);
-
+		
         gl.glDrawElements(
         		geometrie.getDrawMethod(),
         		geometrie.getElemIndexLength(),//param2 is the number of elements (read vertices)
@@ -334,7 +317,7 @@ public class MyRenderer implements GLEventListener{
         //UnBinding
 		gl.glBindVertexArray(0);
         gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        gl.glBindTexture(GL_TEXTURE_2D,0);
+        //gl.glBindTexture(GL_TEXTURE_2D,0);
         gl.glUseProgram(0);
         if (benchmark && System.currentTimeMillis() > last+5000) {
         	last = System.currentTimeMillis();
@@ -354,7 +337,7 @@ public class MyRenderer implements GLEventListener{
 	public void dispose(GLAutoDrawable drawable) {
         GL4 gl = drawable.getGL().getGL4();
         animator.stop();
-        gl.glDeleteProgram(shaderProgramName);	
+        gl.glDeleteProgram(_shaderProgram);	
         System.out.println("Window closed, cleaning context");
 	}
 }

@@ -1,0 +1,8 @@
+bin
+.git
+.settings
+.classpath
+.gitattributes
+.project
+lib
+extlib

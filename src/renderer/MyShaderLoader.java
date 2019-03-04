@@ -1,14 +1,15 @@
 package renderer;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.Vector;
 
+import static com.jogamp.opengl.GL4.*;
 import com.jogamp.opengl.GL4;
-import com.jogamp.opengl.GL4ES3;
 
 import geometries.Geometrie;
 
@@ -16,16 +17,16 @@ public class MyShaderLoader {
 	public static int createProgram(GL4 gl, Geometrie geometrie) {
 		int programName = gl.glCreateProgram();
 
-		int vertShaderName = gl.glCreateShader(GL4ES3.GL_VERTEX_SHADER);		
+		int vertShaderName = gl.glCreateShader(GL_VERTEX_SHADER);		
 		compileShader(gl, vertShaderName, geometrie.getVertexShaderPath(), programName);
 		
 		int geomShaderName;
 		if (geometrie.getGeomShaderPath() != "") {
-			geomShaderName = gl.glCreateShader(GL4ES3.GL_GEOMETRY_SHADER);
+			geomShaderName = gl.glCreateShader(GL_GEOMETRY_SHADER);
 			compileShader(gl, geomShaderName, geometrie.getGeomShaderPath(), programName);
 		}
 		
-		int fragShaderName = gl.glCreateShader(GL4ES3.GL_FRAGMENT_SHADER);
+		int fragShaderName = gl.glCreateShader(GL_FRAGMENT_SHADER);
 		compileShader(gl, fragShaderName, geometrie.getFragmentShaderPath(), programName);
 		
 		gl.glLinkProgram(programName);
@@ -33,8 +34,8 @@ public class MyShaderLoader {
 		//-----------------
 		//Check Program Link
 		IntBuffer programLinkIntBuffer = IntBuffer.allocate(1);
-		gl.glGetProgramiv(programName, GL4ES3.GL_LINK_STATUS, programLinkIntBuffer);
-		if (programLinkIntBuffer.get(0) == GL4ES3.GL_FALSE) {
+		gl.glGetProgramiv(programName, GL_LINK_STATUS, programLinkIntBuffer);
+		if (programLinkIntBuffer.get(0) == GL_FALSE) {
 			displayLinkError(gl, programName, programLinkIntBuffer);
 		}else {
 			System.out.println("Program link success");	
@@ -44,8 +45,8 @@ public class MyShaderLoader {
 		//Validate Program
 		gl.glValidateProgram(programName);
 		IntBuffer programValidIntBuffer = IntBuffer.allocate(1);
-        gl.glGetProgramiv(programName,GL4ES3.GL_VALIDATE_STATUS,programValidIntBuffer);
-		if (programValidIntBuffer.get(0) == GL4ES3.GL_FALSE) {
+        gl.glGetProgramiv(programName,GL_VALIDATE_STATUS,programValidIntBuffer);
+		if (programValidIntBuffer.get(0) == GL_FALSE) {
 			System.out.println("Program validation Error, TODO: implement its log reader");	
 		}else {
 			System.out.println("Program validation success");	
@@ -55,7 +56,9 @@ public class MyShaderLoader {
 	}//end createProgram
 		
 	private static void compileShader(GL4 gl, int shaderName, String shaderPath, int programName) {
-
+		System.out.println("shaderName "+shaderName);
+		System.out.println("shaderPath "+shaderPath);
+		System.out.println("programName "+programName);
 		String[] shadStrArray = null;
 		try {
 			shadStrArray = readFileAt(shaderPath);
@@ -71,8 +74,9 @@ public class MyShaderLoader {
 		gl.glCompileShader(shaderName);
 		
 		IntBuffer shaderIntBuffer = IntBuffer.allocate(1);
-		gl.glGetShaderiv(shaderName, GL4ES3.GL_COMPILE_STATUS, shaderIntBuffer);
-		if (shaderIntBuffer.get(0) == GL4ES3.GL_FALSE) {
+		gl.glGetShaderiv(shaderName, GL_COMPILE_STATUS, shaderIntBuffer);
+		if (shaderIntBuffer.get(0) == GL_FALSE) {
+			System.out.println("Shader "+shaderPath+" -> Compilation Error:");
 			displayCompilError(gl, shaderName, shaderIntBuffer, shaderPath);	
 		}else {
 			System.out.println("Shader "+shaderPath+" -> Compilation success");
@@ -84,11 +88,10 @@ public class MyShaderLoader {
 	
     private static String[] readFileAt(String shaderPath) throws IOException {
     	//read the file at the given path and return an array of each lines of the file
-		ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-		File shaderfile = new File(classLoader.getResource(shaderPath).getFile());
+    	InputStream shaderStream = MyShaderLoader.class.getResourceAsStream("../"+shaderPath);
         String line;
         Vector<String> stringVector = new Vector<>();
-        BufferedReader in = new BufferedReader(new java.io.FileReader(shaderfile));
+        BufferedReader in = new BufferedReader(new InputStreamReader(shaderStream));
         while((line = in.readLine()) != null ){
         	if (line.length()>0) {
         		stringVector.add(line.trim()+"\n");

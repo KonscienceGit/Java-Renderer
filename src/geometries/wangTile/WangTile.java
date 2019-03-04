@@ -79,7 +79,7 @@ public class WangTile extends Geometrie {
 		byteOffset = 2*Float.BYTES;
 		genTileH = genTileW = 50;
 		polygonDetail = genTileH*20;
-		scale = 1.0f/genTileH;
+		scale = 0.8f/genTileH;
 		genTileIndex = generateTileIndex();
 
 		for (int y = 0; y < wangTileH; y++) {
