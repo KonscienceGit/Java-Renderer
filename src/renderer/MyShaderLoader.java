@@ -56,9 +56,6 @@ public class MyShaderLoader {
 	}//end createProgram
 		
 	private static void compileShader(GL4 gl, int shaderName, String shaderPath, int programName) {
-		System.out.println("shaderName "+shaderName);
-		System.out.println("shaderPath "+shaderPath);
-		System.out.println("programName "+programName);
 		String[] shadStrArray = null;
 		try {
 			shadStrArray = readFileAt(shaderPath);
