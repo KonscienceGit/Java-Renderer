@@ -31,7 +31,7 @@ public class MyRenderer implements GLEventListener{
 	private static long start;
 	private static long last;
 	private static long nbFrame;
-	private static Geometrie geometrie = new WangTile();
+	private static Geometrie geometrie = new DisplacementMeshShaded();
 	private static Animator animator;
 	private static int vertexStride;
 	private static int vertexOffset;
@@ -44,7 +44,6 @@ public class MyRenderer implements GLEventListener{
 	private static int proj_uni_location;
 	private static int view_uni_location;
 	private static int model_uni_location;
-	private static int texMap_uni_location; //texture map passed as uniform
 	private static int lightVector_uni_location; //vecteur de lumiere
 	private static int displacementScale_uni_location; //scaling vertical du displacement mapping
 	//attribute locations
@@ -121,8 +120,7 @@ public class MyRenderer implements GLEventListener{
 		gl.glUseProgram(_shaderProgram);//selecting the shader program as active
 
 		if (geometrie.isTextured()) {
-			texCoord_att_location = gl.glGetAttribLocation(_shaderProgram, "texCoord");//getting the attribute name for texture coordinate
-			texMap_uni_location = gl.glGetUniformLocation(_shaderProgram, "texMap");//getting the attribute name for the texture map uniform
+			texCoord_att_location = gl.glGetAttribLocation(_shaderProgram, "texCoord");//getting the attribute name for texture coordinates
 		}else {
 			vertColor_att_location = gl.glGetAttribLocation(_shaderProgram, "color");
 		}
@@ -167,7 +165,7 @@ public class MyRenderer implements GLEventListener{
 		gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 		gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
-	
+
 	private void setupVBO(GL4 gl) {
 		//-------------------------------------
 		//Vertices
@@ -198,7 +196,7 @@ public class MyRenderer implements GLEventListener{
     		gl.glEnableVertexAttribArray(vertColor_att_location);
         }
 	}
-	
+
 	private void setupEBO(GL4 gl) {
 		//--------------------------------------
 		//Element Array
@@ -206,14 +204,25 @@ public class MyRenderer implements GLEventListener{
 	    gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.get(Buffers_ID.Element));
 		gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer.capacity()*Integer.BYTES, elementBuffer, GL_STATIC_DRAW);
 	}
-	
+
 	private void initTextures(GL4 gl) {
 		gl.glGenTextures(Textures_ID.NbTextures, textures); // generate the texture names in the textures buffer array
 		gl.glActiveTexture(GL_TEXTURE0); //select a texture unit (0) to be the one active
         gl.glBindTexture(GL_TEXTURE_2D, textures.get(Textures_ID.Texture0)); //bind the texture name, 
-        //create a texture object of the designated target type and associate the name to it.
-        
-        URL imgUrl = getClass().getClassLoader().getResource(geometrie.getTexturePath());
+
+
+		int mipmapLevel = 0; //base level, full resolution. each level above 1 is a power of 2 reduction of texture resolution.
+		loadTexture(gl, geometrie.getTexturePath(), mipmapLevel);
+		
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0); //set base mipmap level
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipmapLevel); //set max mip map level?
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	}
+
+	private void loadTexture(GL4 gl, String texturePath, int mipmapLevel) {
+
+        URL imgUrl = getClass().getClassLoader().getResource(texturePath);
         if (imgUrl == null) {
         	System.out.println("Image not found");
     	}else {
@@ -237,9 +246,8 @@ public class MyRenderer implements GLEventListener{
         	imgFloats[i]/=255;//put back the 0.0-255.0 float into 0.0-1.0 float range 
         }
                 
-        int mipmapLevel = 0; //base level, full resolution. each level above 1 is a power of 2 reduction of texture resolution.
 		FloatBuffer imgFloatBuffer = FloatBuffer.wrap(imgFloats);
-
+		
 		gl.glTexImage2D(//specify the texture object properties, could use texStorage2D to give the object a final allocation size
 				GL_TEXTURE_2D,//target
 				mipmapLevel,
@@ -251,17 +259,6 @@ public class MyRenderer implements GLEventListener{
 				GL_FLOAT,//type of each color, ex GL_UNSIGNED_INT_8_8_8_8
 				imgFloatBuffer//the data buffer
 				);
-		gl.glUniform1i(texMap_uni_location,GL_TEXTURE0); //set the uniform to be the attached texture unit
-		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0); //set base mipmap level
-		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipmapLevel); //set max mip map level?
-		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		gl.glSamplerParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		gl.glSamplerParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		IntBuffer swizzle = IntBuffer.wrap(new int[]{GL_RED, GL_GREEN, GL_BLUE, GL_ONE});
-		//swizzle the colors of the textures, see https://www.khronos.org/opengl/wiki/Texture#Swizzle_mask
-		gl.glTexParameterIiv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzle);
-        //gl.glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
     private void updateModelMatrix(GL4 gl) {
@@ -285,7 +282,7 @@ public class MyRenderer implements GLEventListener{
         
         gl.glUniformMatrix4fv(model_uni_location, 1, false, modelMatrixBuffer );
     }
-	
+
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		GL4 gl = drawable.getGL().getGL4();
@@ -332,7 +329,7 @@ public class MyRenderer implements GLEventListener{
         GL4 gl = drawable.getGL().getGL4();
         gl.glViewport(x, y, width, height);
 	}
-	
+
 	@Override
 	public void dispose(GLAutoDrawable drawable) {
         GL4 gl = drawable.getGL().getGL4();

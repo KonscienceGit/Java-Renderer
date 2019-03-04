@@ -7,7 +7,7 @@
 in vec2 position; //x, y coordinates
 in vec2 texCoord; //u, v coordinates
 
-uniform sampler2D texMap; //texture map for displacement
+layout(binding=0) uniform sampler2D texMap; //texture map for displacement
 
 // Projection/View/Model matrix
 uniform mat4 proj;
