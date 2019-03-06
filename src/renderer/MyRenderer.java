@@ -111,6 +111,7 @@ public class MyRenderer implements GLEventListener{
 		gl.glEnable(GL_CULL_FACE);//activer seulement pour les formes geometriques de volume (pas les billboard par exemple)
 		//gl.glCullFace(GL_FRONT);//permet de cacher les faces de devant au lieu de derriere (skybox, etc) (GL_BACK par defaut)
 		//gl.glFrontFace(GL_CW); //permet de définir le sens caractérisant les fornt faces (clock wise CW ou counter clock wise CCW)
+		System.out.println(Toolbox.getGraphicCapabilities(gl));
 	}
 	
 	private void initShaders(GL4 gl) {
