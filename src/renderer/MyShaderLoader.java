@@ -86,7 +86,8 @@ public class MyShaderLoader {
     private static String[] readFileAt(String shaderPath) throws IOException {
     	//read the file at the given path and return an array of each lines of the file
     	InputStream shaderStream = MyShaderLoader.class.getResourceAsStream("../"+shaderPath);
-        String line;
+    	if (shaderStream == null) {System.out.println("ShaderLoader: path ../shaders/"+shaderPath+" is incorrect!\n");}
+    	String line;
         Vector<String> stringVector = new Vector<>();
         BufferedReader in = new BufferedReader(new InputStreamReader(shaderStream));
         while((line = in.readLine()) != null ){

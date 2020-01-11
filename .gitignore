@@ -1,6 +1,7 @@
 bin
-.git
-.settings
-.classpath
-.gitattributes
-.project
+.classpath/
+.gitattributes/
+.project/
+.git/
+.settings/
+bin/

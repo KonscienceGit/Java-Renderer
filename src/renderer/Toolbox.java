@@ -61,10 +61,20 @@ public class Toolbox {
 		report = report.concat(getMaxTextureSize2D(gl));
 		report = report.concat(getMaxTextureSize3D(gl));
 		report = report.concat("\n");
+
 		
-		if (gl.isExtensionAvailable("GL_ARB_sparse_texture")) {
-			report = report.concat("Extention: GL_ARB_sparse_texture:\n");
+		report = report.concat("\nSupported usefull extentions:");
+		String[] extentions = {
+				"GL_ARB_sparse_texture",
+				"GL_AMD_sparse_texture"
+		};
+		for (String ext: extentions) {
+			if (gl.isExtensionAvailable(ext)) {
+				report = report.concat("Extention: "+ext+" is supported!\n");
+			}
 		}
+		report = report.concat("\n");
+		
 		return report;
 	}
 	
