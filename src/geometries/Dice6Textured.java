@@ -4,7 +4,7 @@ import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL4ES3;
 
-public class Dice6Textured extends Geometrie {
+public class Dice6Textured extends Geometry {
 	public Dice6Textured() {
 		drawMethod = GL4ES3.GL_TRIANGLES;
 		valueType = GL4ES3.GL_UNSIGNED_INT;

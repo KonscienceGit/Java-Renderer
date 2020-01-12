@@ -17,8 +17,7 @@ uniform mat4 view;
 uniform mat4 model;
 
 void main(){
-
-	vec3 displacement =  vec3( texture(texMap,texCoord));
+	vec3 displacement = vec3(texture(texMap,texCoord));
 	float heightCoefficient = dispScale*(displacement.x + displacement.y + displacement.z)/3;
     gl_Position = proj * (view * (model * vec4(position, heightCoefficient, 1)));
 }

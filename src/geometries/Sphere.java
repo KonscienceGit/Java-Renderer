@@ -6,7 +6,7 @@ import java.util.Vector;
 
 import com.jogamp.opengl.GL4ES3;
 
-public class Sphere extends Geometrie {
+public class Sphere extends Geometry {
 	private static final double pi2 = 2*Math.PI;
 	private static final double pi = Math.PI;
 	private boolean wireframe = false;
@@ -52,7 +52,7 @@ public class Sphere extends Geometrie {
 	@Override
 	public float[] getVertexData() {
 		int n = polygonDetail;
-		Vector<Float> vertexVec = new Vector<Float>();
+		Vector<Float> vertexVec = new Vector<>();
 		//sommet
 		vertexVec.add(0.0f);//coordonnee x
 		vertexVec.add(0.0f);//coordonnee y
@@ -82,10 +82,6 @@ public class Sphere extends Geometrie {
 		for (int i = 0; i < vertexVec.size(); i++) {
 			vertexArray[i] = vertexVec.get(i); 
 		}
-		/*System.out.println("x\t\ty\t\tz\t\tR\t\tG\t\tB");//Afficher les coordonnées de vertex et de textures
-		for (int i = 0; i < vertexVec.size(); i+= 6) {
-			System.out.println(formatF(vertexArray[i])+"\t"+formatF(vertexArray[i+1])+"\t"+formatF(vertexArray[i+2])+"\t"+formatF(vertexArray[i+3])+"\t"+formatF(vertexArray[i+4])+"\t"+formatF(vertexArray[i+5]));
-		}*/
 		return vertexArray;
 	}
 
@@ -108,7 +104,7 @@ public class Sphere extends Geometrie {
 
 	private Vector<Integer> generateLinesElements(){
 		int n = polygonDetail;
-		Vector<Integer> elementVec = new Vector<Integer>();
+		Vector<Integer> elementVec = new Vector<>();
 		//cone du haut, sans la base
 		for (int i = 1; i < n+1; i++) {//Pour chaque rayon/triangle de lignes (sauf le dernier)
 			elementVec.add(0);
@@ -151,7 +147,7 @@ public class Sphere extends Geometrie {
 
 	private Vector<Integer> generateTrianglesElements(){
 		int n = polygonDetail;
-		Vector<Integer> elementVec = new Vector<Integer>();
+		Vector<Integer> elementVec = new Vector<>();
 		//cone du haut
 		for (int i = 1; i < n; i++) {//Pour chaque rayon/triangle de lignes (sauf le dernier)
 			elementVec.add(0);
@@ -162,7 +158,6 @@ public class Sphere extends Geometrie {
 		elementVec.add(0);
 		elementVec.add(1);
 		elementVec.add(n);
-
 
 		//cone(s) tronqué(s)
 		for (int i = 1; i < n-2; i++) {//Pour chaque rayon/triangle de lignes (sauf le dernier)

@@ -5,7 +5,7 @@ import java.util.Vector;
 
 import com.jogamp.opengl.GL4ES3;
 
-public class DisplacementMesh extends Geometrie {
+public class DisplacementMesh extends Geometry {
 	private boolean wireframe = true;
 	public DisplacementMesh() {
 		if(wireframe) {
@@ -42,7 +42,7 @@ public class DisplacementMesh extends Geometrie {
 	
 	@Override
 	public float[] getVertexData() {
-		Vector<Float> vertexVec = new Vector<Float>();
+		Vector<Float> vertexVec = new Vector<>();
 		for (int y = 0; y < polygonDetail; y++) {
 			for (int x = 0; x < polygonDetail; x++) {
 				vertexVec.add(center(x));//coordonnee x
@@ -59,10 +59,6 @@ public class DisplacementMesh extends Geometrie {
 		for (int i = 0; i < vertexVec.size(); i++) {
 			vertexArray[i] = vertexVec.get(i); 
 		}
-		/*System.out.println("x\t\ty\t\tu\t\tv");//Afficher les coordonnées de vertex et de textures
-		for (int i = 0; i < vertexVec.size(); i+= 5) {
-			System.out.println(vertexArray[i]+"\t\t"+vertexArray[i+1]+"\t\t"+vertexArray[i+2]+"\t\t"+vertexArray[i+3]);
-		}*/
 		return vertexArray;
 	}
 	
@@ -85,26 +81,26 @@ public class DisplacementMesh extends Geometrie {
 
 	private Vector<Integer> generateLinesElements(){
 		int n = polygonDetail;
-		Vector<Integer> elementVec = new Vector<Integer>();
+		Vector<Integer> elementVec = new Vector<>();
 		for (int y = 0; y < n-1; y++) {
 			for (int x = 0; x < n-1; x++) {
-				elementVec.add((int) (x+y*n));//haut gauche, ligne 1
-				elementVec.add((int) ((x+1)+y*n));//haut droite, ligne 1
+				elementVec.add(x+y*n);//haut gauche, ligne 1
+				elementVec.add((x+1)+y*n);//haut droite, ligne 1
 
-				elementVec.add((int) ((x+1)+y*n));//haut droite, ligne 2
-				elementVec.add((int) (x+(y+1)*n));//angle inferieur gauche, ligne 2
+				elementVec.add((x+1)+y*n);//haut droite, ligne 2
+				elementVec.add(x+(y+1)*n);//angle inferieur gauche, ligne 2
 
-				elementVec.add((int) (x+(y+1)*n));//angle inferieur gauche, ligne 3
-				elementVec.add((int) (x+y*n));//angle supérieur gauche, ligne 3
+				elementVec.add(x+(y+1)*n);//angle inferieur gauche, ligne 3
+				elementVec.add(x+y*n);//angle supérieur gauche, ligne 3
 
 				if (x == n-2 ) { //si fin de rangée (x), finir en dessinant la derniere ligne
-					elementVec.add((int) ((x+1)+y*n));//angle supérieur droit, ligne 4
-					elementVec.add((int) ((x+1)+(y+1)*n));//angle inférieur droit, ligne 4
+					elementVec.add((x+1)+y*n);//angle supérieur droit, ligne 4
+					elementVec.add((x+1)+(y+1)*n);//angle inférieur droit, ligne 4
 				}
 
 				if (y == n-2 ) { //si fin de colonne (y), finir en dessinant la derniere ligne
-					elementVec.add((int) ((x+1)+(y+1)*n));//angle inférieur droit, ligne 5
-					elementVec.add((int) (x+(y+1)*n));//angle inférieur gauche, ligne 5
+					elementVec.add((x+1)+(y+1)*n);//angle inférieur droit, ligne 5
+					elementVec.add(x+(y+1)*n);//angle inférieur gauche, ligne 5
 				}
 			}
 		}
@@ -113,16 +109,16 @@ public class DisplacementMesh extends Geometrie {
 
 	private Vector<Integer> generateTrianglesElements(){
 		int n = polygonDetail;
-		Vector<Integer> elementVec = new Vector<Integer>();
+		Vector<Integer> elementVec = new Vector<>();
 		for (int y = 0; y < n-1; y++) {
 			for (int x = 0; x < n-1; x++) {
-				elementVec.add((int) (x+y*n));//angle supérieur gauche, triangle 1
-				elementVec.add((int) ((x+1)+y*n));//angle supérieur droit, triangle 1
-				elementVec.add((int) (x+(y+1)*n));//angle inférieur gauche, triangle 1
+				elementVec.add(x+y*n);//angle supérieur gauche, triangle 1
+				elementVec.add((x+1)+y*n);//angle supérieur droit, triangle 1
+				elementVec.add(x+(y+1)*n);//angle inférieur gauche, triangle 1
 
-				elementVec.add((int) ((x+1)+y*n));//angle supérieur droit, triangle 2
-				elementVec.add((int) ((x+1)+(y+1)*n));//angle inférieur droit, triangle 2
-				elementVec.add((int) (x+(y+1)*n));//angle inférieur gauche, triangle 2
+				elementVec.add((x+1)+y*n);//angle supérieur droit, triangle 2
+				elementVec.add((x+1)+(y+1)*n);//angle inférieur droit, triangle 2
+				elementVec.add(x+(y+1)*n);//angle inférieur gauche, triangle 2
 			}
 		}
 		return elementVec;

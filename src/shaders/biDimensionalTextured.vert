@@ -5,11 +5,9 @@ in vec2 position;
 // Incoming vertex color
 in vec2 texCoord;
 
-
 uniform mat4 proj;
 uniform mat4 view;
 uniform mat4 model;
-
 
 // Outgoing texture coordinates.
 out vec2 interpolatedTexCoord;

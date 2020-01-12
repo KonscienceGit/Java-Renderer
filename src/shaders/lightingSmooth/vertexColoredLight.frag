@@ -1,14 +1,9 @@
 #version 450
 
-// Incoming interpolated (between vertices) color.
 in	vec3 vertColor;
 in	vec3 vertPosition;
-
 uniform vec3 lightVector;
-
-// Outgoing final color.
 out vec4 outputColor;
-
 
 void main(){
     vec3 normal = normalize(vertPosition);

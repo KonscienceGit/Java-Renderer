@@ -1,11 +1,11 @@
-package geometries.wangTile;
+package objects3D.wangTile;
 
 import java.nio.IntBuffer;
 import java.util.Vector;
 import com.jogamp.opengl.GL4ES3;
-import geometries.Geometrie;
+import geometries.Geometry;
 
-public class WangTile extends Geometrie {
+public class WangTile extends Geometry {
 	//dimensions du wang tile original
 	private static int wangTileH = 4;
 	private static int wangTileW = 4;
@@ -67,10 +67,10 @@ public class WangTile extends Geometrie {
 		texturePath = "images/wang_tile.png";
 		lightSource = true;
 		normals = true;
-		vertexShaderPath = "geometries/wangTile/vertex.vert";
-		geomShaderPath = "geometries/wangTile/geometrie.geom";
+		vertexShaderPath = "objects3D/wangTile/vertex.vert";
+		geomShaderPath = "objects3D/wangTile/geometrie.geom";
 		//geomShaderPath = "geometries/wangTile/geometriePoints.geom";
-		fragmentShaderPath = "geometries/wangTile/fragment.frag";
+		fragmentShaderPath = "objects3D/wangTile/fragment.frag";
 		//fragmentShaderPath = "geometries/wangTile/fragmentWhite.frag";
 		//fragmentShaderPath = "geometries/wangTile/fragmentNormalColored.frag";
 		//fragmentShaderPath = "geometries/wangTile/fragmentDepthBuffDebug.frag";
@@ -79,7 +79,7 @@ public class WangTile extends Geometrie {
 		byteOffset = 2*Float.BYTES;
 		genTileH = genTileW = 50;
 		polygonDetail = genTileH*20;
-		scale = 0.8f/genTileH;
+		displacementScale = 0.8f/genTileH;
 		genTileIndex = generateTileIndex();
 
 		for (int y = 0; y < wangTileH; y++) {
@@ -109,24 +109,18 @@ public class WangTile extends Geometrie {
 				 
 				 if(y==0) {//si on est sur la premiere ligne de tile, pas de bordure nord
 					 northBorder = false;
-					 //System.out.println("Pas de bordure nord, début de mesh");
 				 }else {//sinon, récupérer la bordure sud du tile au nord
 					 northBorder = wangTilePhysBorder[tileIndexArray[x+(y-1)*genTileW]][1];
-					 //System.out.println("Bordure nord: "+northBorder);
 				 }
 				 if(x == 0) {//si on est sur la premiere colonne de tile, pas de bordure ouest
 					 westBorder = false;
-					 //System.out.println("Pas de bordure ouest, début de mesh");
 				 }else {//sinon, récupérer la bordure Est du tile a l'ouest
 					 westBorder = wangTilePhysBorder[tileIndexArray[(x-1)+y*genTileW]][2];
-					 //System.out.println("Bordure ouest: "+westBorder);
 				 }
 				 //si on est pas en bout sud ou en bout est, pas de restrictions, bordure au choix
 				 //true == ne pas mettre de bordure
 				 southBorderEnd = (y == genTileH-1);
-				 //System.out.println("Fin de mesh sud? "+southBorderEnd);
 				 eastBorderEnd =  (x == genTileW-1);
-				 //System.out.println("Fin de mesh est? "+eastBorderEnd);
 				 int randomTileNum = (int)(Math.random()*wangTileCount);
 				 int counter =  randomTileNum;
 				 int endCounter = randomTileNum+wangTileCount;
@@ -141,13 +135,6 @@ public class WangTile extends Geometrie {
 					 
 					 if(validBorders == 4) {
 						 match = true;
-						 /*
-						 System.out.println("Tile choisi: "+tileNum);
-						 System.out.println("Nord "+wangTilePhysBorder[tileNum][0]);
-						 System.out.println("Sud  "+wangTilePhysBorder[tileNum][1]);
-						 System.out.println("East "+wangTilePhysBorder[tileNum][2]);
-						 System.out.println("West "+wangTilePhysBorder[tileNum][3]);
-						 System.out.println("Accessing tileIndexArray of size :"+genTileCount+" with index "+(x+y*genTileW));*/
 						 tileIndexArray[x+y*genTileW] = (short) tileNum;
 					 }
 					 counter++;
@@ -204,7 +191,7 @@ public class WangTile extends Geometrie {
 	
 	@Override
 	public float[] getVertexData() {
-		Vector<Float> vertexVec = new Vector<Float>();
+		Vector<Float> vertexVec = new Vector<>();
 		for (int y = 0; y < polygonDetail; y++) {
 			float vertCoordY = center(y);
 			for (int x = 0; x < polygonDetail; x++) {
@@ -246,7 +233,7 @@ public class WangTile extends Geometrie {
 	/**@return Retourne un vecteur d'index de vertex, chaque trio d'index représentant un triangle.*/
 	private Vector<Integer> generateTrianglesElements(){
 		int n = polygonDetail;
-		Vector<Integer> elementVec = new Vector<Integer>();
+		Vector<Integer> elementVec = new Vector<>();
 		for (short y = 0; y < n-1; y++) {
 			for (short x = 0; x < n-1; x++) {
 				elementVec.add(x+y*n);//angle supérieur gauche, triangle 1

@@ -4,7 +4,7 @@ import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL4ES3;
 
-public class Carre2DTextured extends Geometrie {
+public class Carre2DTextured extends Geometry {
 	public Carre2DTextured() {
 		drawMethod = GL4ES3.GL_TRIANGLES;
 		valueType = GL4ES3.GL_UNSIGNED_INT;

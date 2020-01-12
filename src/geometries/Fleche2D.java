@@ -4,7 +4,7 @@ import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL4ES3;
 
-public class Fleche2D extends Geometrie{
+public class Fleche2D extends Geometry {
 	
 	public Fleche2D() {
 		drawMethod = GL4ES3.GL_TRIANGLES;

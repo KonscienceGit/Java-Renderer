@@ -4,7 +4,7 @@ import java.nio.IntBuffer;
 
 import com.jogamp.opengl.GL4ES3;
 
-public class Cube3D extends Geometrie {
+public class Cube3D extends Geometry {
 	public Cube3D() {
 		drawMethod = GL4ES3.GL_TRIANGLES;
 		valueType = GL4ES3.GL_UNSIGNED_INT;

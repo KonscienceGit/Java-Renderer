@@ -15,7 +15,6 @@ uniform mat4 model;
 out vec2 interpolatedTexCoord;
 
 void main(){
-
     // Normally gl_Position is in Clip Space and we calculate it by multiplying together all the matrices
     gl_Position = proj * (view * (model * vec4(position, 1)));
 

@@ -2,7 +2,7 @@ package geometries;
 
 import java.nio.IntBuffer;
 
-public abstract class Geometrie {
+public abstract class Geometry {
 	protected static int drawMethod = -1;
 	protected static int valueType = -1;
 	protected static boolean textured = false;
@@ -25,19 +25,19 @@ public abstract class Geometrie {
     protected static int byteOffset2 = 0;
     protected static int elemIndexLength = 0;
     protected static int polygonDetail = 0;
-	protected static float scale = 0.5f;
+	protected static float displacementScale = 0.5f;
 
-	/**@return Retourne l'échelle de scaling vertical (axe z) du modèle*/
-	public float getScale() {
-		return scale;
+	/**@return Return the vertex displacement scale parameter (used in displacement mapping)*/
+	public float getDisplacementScale() {
+		return displacementScale;
 	}
 
-	/**@return Retourne la métode de "draw", (GL_LINES ou GL_TRIANGLES)	 */
+	/**@return Return the draw method to use (GL_LINES or GL_TRIANGLES)	 */
 	public int getDrawMethod() {
 		return drawMethod;
 	}
 
-	/**@return Retourne le type des valeurs d'index, (GL_UNSIGNED_SHORT ou GL_UNSIGNED_INT)  */
+	/**@return Return the value type of the index (GL_UNSIGNED_SHORT, GL_UNSIGNED_INT ...)  */
 	//TODO Implémenter le binding de buffer d'element DANS les sous classes géométries pour pouvoir choisir le type
 	public int getValueType() {
 		return valueType;
@@ -48,18 +48,6 @@ public abstract class Geometrie {
 	}
 	public boolean hasNormals() {
 		return normals;
-	}
-	public boolean isTriDimensional() {
-		return triDimensional;
-	}
-	public boolean isRotate2D() {
-		return rotate2D;
-	}
-	public boolean isRotate3D() {
-		return rotate3D;
-	}
-	public boolean isRepeatTexture() {
-		return repeatTexture;
 	}
 	public boolean hasLightSource() {
 		return lightSource;
@@ -93,9 +81,6 @@ public abstract class Geometrie {
 	}
 	public int getByteOffset() {
 		return byteOffset;
-	}
-	public int getByteOffset2() {
-		return byteOffset2;
 	}
 	public int getElemIndexLength() {
 		return elemIndexLength;

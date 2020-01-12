@@ -19,8 +19,7 @@ uniform mat4 model;
 out vec3 interpolatedColor;
 
 void main(){
-
-	vec3 displacement =  vec3( texture(texMap,texCoord));
+	vec3 displacement =  vec3(texture(texMap,texCoord));
 	float heightCoefficient = (displacement.x + displacement.y + displacement.z)/3;
     // Normally gl_Position is in Clip Space and we calculate it by multiplying together all the matrices
     gl_Position = proj * (view * (model * vec4(position, heightCoefficient, 1)));

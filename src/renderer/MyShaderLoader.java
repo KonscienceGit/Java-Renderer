@@ -11,23 +11,23 @@ import java.util.Vector;
 import static com.jogamp.opengl.GL4.*;
 import com.jogamp.opengl.GL4;
 
-import geometries.Geometrie;
+import geometries.Geometry;
 
 public class MyShaderLoader {
-	public static int createProgram(GL4 gl, Geometrie geometrie) {
+	public static int createProgram(GL4 gl, Geometry geometry) {
 		int programName = gl.glCreateProgram();
 
 		int vertShaderName = gl.glCreateShader(GL_VERTEX_SHADER);		
-		compileShader(gl, vertShaderName, geometrie.getVertexShaderPath(), programName);
+		compileShader(gl, vertShaderName, geometry.getVertexShaderPath(), programName);
 		
 		int geomShaderName;
-		if (geometrie.getGeomShaderPath() != "") {
+		if (!"".equals(geometry.getGeomShaderPath())) {
 			geomShaderName = gl.glCreateShader(GL_GEOMETRY_SHADER);
-			compileShader(gl, geomShaderName, geometrie.getGeomShaderPath(), programName);
+			compileShader(gl, geomShaderName, geometry.getGeomShaderPath(), programName);
 		}
 		
 		int fragShaderName = gl.glCreateShader(GL_FRAGMENT_SHADER);
-		compileShader(gl, fragShaderName, geometrie.getFragmentShaderPath(), programName);
+		compileShader(gl, fragShaderName, geometry.getFragmentShaderPath(), programName);
 		
 		gl.glLinkProgram(programName);
 		
@@ -53,7 +53,7 @@ public class MyShaderLoader {
 		}
 		
 		return programName;
-	}//end createProgram
+	}
 		
 	private static void compileShader(GL4 gl, int shaderName, String shaderPath, int programName) {
 		String[] shadStrArray = null;
@@ -81,30 +81,31 @@ public class MyShaderLoader {
 			gl.glDeleteShader(shaderName);//once they are compiled and attached to the program, the shaders can be tagged for deletion.
 			//they'll be deleted as soon as the program is deleted, or as soon as the shader is detached by glDetachShader()
 		}
-	}//end compileShader
+	}
 	
     private static String[] readFileAt(String shaderPath) throws IOException {
     	//read the file at the given path and return an array of each lines of the file
     	InputStream shaderStream = MyShaderLoader.class.getResourceAsStream("../"+shaderPath);
-    	if (shaderStream == null) {System.out.println("ShaderLoader: path ../shaders/"+shaderPath+" is incorrect!\n");}
     	String line;
         Vector<String> stringVector = new Vector<>();
-        BufferedReader in = new BufferedReader(new InputStreamReader(shaderStream));
-        while((line = in.readLine()) != null ){
-        	if (line.length()>0) {
-        		stringVector.add(line.trim()+"\n");
-                //System.out.println(line);	
-        	}
-        }
-        in.close();
-        //transfer the vector into an array
-        String[] stringArray = new String[stringVector.size()];
-        for (int i = 0; i < stringVector.size(); i++) {
-        	stringArray[i] = stringVector.get(i);
-        	//System.out.println(stringArray[i]);
-        }
-        return stringArray;
-    }//end readFileAt
+		if (shaderStream != null) {
+			BufferedReader in = new BufferedReader(new InputStreamReader(shaderStream));
+			while((line = in.readLine()) != null ){
+				if (line.length()>0) {
+					stringVector.add(line.trim()+"\n");
+				}
+			}
+			in.close();
+			//transfer the vector into an array
+			String[] stringArray = new String[stringVector.size()];
+			for (int i = 0; i < stringVector.size(); i++) {
+				stringArray[i] = stringVector.get(i);
+			}
+			return stringArray;
+		}else {
+			throw new IOException("ShaderLoader failed to load: ../shaders/" + shaderPath + "\n");
+		}
+    }
     
     private static int[] getLineLengthArray(String[] stringArray){
     	//provide an int[] array of each lines' length in the given string array
@@ -118,7 +119,7 @@ public class MyShaderLoader {
         	lineLengthArray[i] = stringArray[i].length();
         }      
         return lineLengthArray;
-    }//end getLineLengthArray
+    }
     
     private static void displayLinkError(GL4 gl, int progName, IntBuffer intBuffer) {
         int size = intBuffer.get(0);
@@ -131,7 +132,7 @@ public class MyShaderLoader {
         } else {
             System.out.println("Unknown Program Link Error");
         } 
-    }//end displayLinkError
+    }
     
     private static void displayCompilError(GL4 gl, int shaderName, IntBuffer intBuffer, String shaderPath) {
         int size = intBuffer.get(0);
@@ -144,5 +145,5 @@ public class MyShaderLoader {
         } else {
             System.out.println(shaderPath+" -> Unknown Shader Compilation Error");
         } 
-    }//end displayCompilError
-}//end class
+    }
+}

@@ -4,7 +4,7 @@ import java.nio.IntBuffer;
 import java.util.Vector;
 import static com.jogamp.opengl.GL4.*;
 
-public class DisplacementMeshShaded extends Geometrie {
+public class DisplacementMeshShaded extends Geometry {
 	public DisplacementMeshShaded() {
 		drawMethod = GL_TRIANGLES;	
 		wireframe = false;	
@@ -41,7 +41,7 @@ public class DisplacementMeshShaded extends Geometrie {
 	
 	@Override
 	public float[] getVertexData() {
-		Vector<Float> vertexVec = new Vector<Float>();
+		Vector<Float> vertexVec = new Vector<>();
 		for (int y = 0; y < polygonDetail; y++) {
 			for (int x = 0; x < polygonDetail; x++) {
 				vertexVec.add(center(x));//coordonnee x
@@ -54,10 +54,6 @@ public class DisplacementMeshShaded extends Geometrie {
 		for (int i = 0; i < vertexVec.size(); i++) {
 			vertexArray[i] = vertexVec.get(i); 
 		}
-		/*System.out.println("x\t\ty\t\tu\t\tv");//Afficher les coordonnées de vertex et de textures
-		for (int i = 0; i < vertexVec.size(); i+= 5) {
-			System.out.println(vertexArray[i]+"\t\t"+vertexArray[i+1]+"\t\t"+vertexArray[i+2]+"\t\t"+vertexArray[i+3]);
-		}*/
 		return vertexArray;
 	}
 	
@@ -82,7 +78,7 @@ public class DisplacementMeshShaded extends Geometrie {
 
 	private Vector<Integer> generateLinesElements(){
 		int n = polygonDetail;
-		Vector<Integer> elementVec = new Vector<Integer>();
+		Vector<Integer> elementVec = new Vector<>();
 		for (short y = 0; y < n-1; y++) {
 			for (short x = 0; x < n-1; x++) {
 				elementVec.add(x+y*n);//haut gauche, ligne 1
@@ -110,7 +106,7 @@ public class DisplacementMeshShaded extends Geometrie {
 
 	private Vector<Integer> generateTrianglesElements(){
 		int n = polygonDetail;
-		Vector<Integer> elementVec = new Vector<Integer>();
+		Vector<Integer> elementVec = new Vector<>();
 		for (short y = 0; y < n-1; y++) {
 			for (short x = 0; x < n-1; x++) {
 				elementVec.add(x+y*n);//angle supérieur gauche, triangle 1

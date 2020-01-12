@@ -5,7 +5,7 @@ import com.jogamp.opengl.GL4ES3;
 import java.nio.IntBuffer;
 import java.util.Vector;
 
-public class Disque extends Geometrie {
+public class Disque extends Geometry {
 	private static final double pi2 = 2*Math.PI;
 	private boolean wireframe = false;
 	public Disque() {
@@ -35,7 +35,7 @@ public class Disque extends Geometrie {
 
 	@Override
 	public float[] getVertexData() {
-		Vector<Float> vertexVec = new Vector<Float>();
+		Vector<Float> vertexVec = new Vector<>();
 		//centre
 		vertexVec.add(0.0f);//coordonnee x
 		vertexVec.add(0.0f);//coordonnee y
@@ -52,10 +52,6 @@ public class Disque extends Geometrie {
 		for (int i = 0; i < vertexVec.size(); i++) {
 			vertexArray[i] = vertexVec.get(i);
 		}
-		/*System.out.println("x\t\ty\t\tz\t\tR\t\tG\t\tB");//Afficher les coordonnées de vertex et de textures
-		for (int i = 0; i < vertexVec.size(); i+= 6) {
-			System.out.println(formatF(vertexArray[i])+"\t"+formatF(vertexArray[i+1])+"\t"+formatF(vertexArray[i+2])+"\t"+formatF(vertexArray[i+3])+"\t"+formatF(vertexArray[i+4])+"\t"+formatF(vertexArray[i+5]));
-		}*/
 		return vertexArray;
 	}
 
@@ -78,35 +74,35 @@ public class Disque extends Geometrie {
 
 	private Vector<Integer> generateLinesElements(){
 		int n = polygonDetail;
-		Vector<Integer> elementVec = new Vector<Integer>();
+		Vector<Integer> elementVec = new Vector<>();
 		for (int i = 0; i < n-1; i++) {//Pour chaque rayon/triangle de lignes (sauf le dernier)
-			elementVec.add((int) 0);    //ligne 1
-			elementVec.add((int) (i+1));//ligne 1
+			elementVec.add(0);    //ligne 1
+			elementVec.add(i+1);//ligne 1
 
-			elementVec.add((int) (i+1));//ligne 2
-			elementVec.add((int) (i+2));//ligne 2
+			elementVec.add(i+1);//ligne 2
+			elementVec.add(i+2);//ligne 2
 		}
 		//Dernier rayon, fermer le cercle
-		elementVec.add((int) (0));//ligne 1
-		elementVec.add((int) (n));//ligne 1
+		elementVec.add(0);//ligne 1
+		elementVec.add(n);//ligne 1
 
-		elementVec.add((int) (n));//ligne 2
-		elementVec.add((int) (1));//ligne 2
+		elementVec.add(n);//ligne 2
+		elementVec.add(1);//ligne 2
 		return elementVec;
 	}
 
 	private Vector<Integer> generateTrianglesElements(){
 		int n = polygonDetail;
-		Vector<Integer> elementVec = new Vector<Integer>();
+		Vector<Integer> elementVec = new Vector<>();
 		for (int i = 0; i < n-1; i++) {//tout les triangles sauf le dernier
-			elementVec.add((int) 0);
-			elementVec.add((int) (i+1));
-			elementVec.add((int) (i+2));
+			elementVec.add(0);
+			elementVec.add(i+1);
+			elementVec.add(i+2);
 		}
 		//Dernier triangle pour connecter le cercle
-		elementVec.add((int) 0);
-		elementVec.add((int) (n));
-		elementVec.add((int) (1));
+		elementVec.add(0);
+		elementVec.add(n);
+		elementVec.add(1);
 		return elementVec;
 	}
 }

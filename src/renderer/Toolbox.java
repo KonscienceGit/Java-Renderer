@@ -117,27 +117,11 @@ public class Toolbox {
 		System.out.println("var _vertexBufferName is: "+_vertexBufferName);
 		gl.glGetIntegerv(GL_ARRAY_BUFFER_BINDING, intValueBuffer);
 		System.out.println("Active ArrayBuffer is: "+intValueBuffer.get(0));
-		//Display content of Vertex Buffer
-		/*int ArraySize = _vertexBuffer.capacity();
-		int bufferByteSize = ArraySize*Float.BYTES;
-		ByteBuffer getVertBuffer = ByteBuffer.allocateDirect(bufferByteSize);
-		gl.glGetBufferSubData(GL_ARRAY_BUFFER, 0, bufferByteSize, getVertBuffer);
-		System.out.println("Array Buffer content: ");
-		ByteBuffer invertedByteBuffer = ByteBuffer.allocateDirect(bufferByteSize);
-		for (int i = 0; i < ArraySize ; i++) {
-			invertedByteBuffer.put(getVertBuffer.get(i*Float.BYTES+3));
-			invertedByteBuffer.put(getVertBuffer.get(i*Float.BYTES+2));
-			invertedByteBuffer.put(getVertBuffer.get(i*Float.BYTES+1));
-			invertedByteBuffer.put(getVertBuffer.get(i*Float.BYTES));
-		}
-		for (int i = 0 ; i < ArraySize; i++) {
-			System.out.println("Valeur "+i+" : "+invertedByteBuffer.getFloat(i*Float.BYTES));
-		}*/
 	}
 	
 	public static String getErrorCode(GL4 gl){
 		int errorCode = gl.glGetError();
-		String errorStr = "";
+		String errorStr;
 		switch (errorCode) {
 		case GL_NO_ERROR:
 			errorStr = "GL_NO_ERROR";
